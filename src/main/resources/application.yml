@@ -1,0 +1,36 @@
+server:
+  port: 9090
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bankingManagementSystem
+    username: postgres
+    password: "@9170065838"
+  jpa:
+    hibernate:
+      ddl-auto: none   # changed from 'update' to 'none' to avoid creating existing DB objects
+      show-sql: true
+
+  application:
+    name: BankingManagement-api
+
+
+logging:
+  level:
+    com:
+      bankingmanagement: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+  file:
+    name: logs/bankingmanagement.log
+    path: ./logs
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
