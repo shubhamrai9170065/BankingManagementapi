@@ -5,6 +5,7 @@ import com.bankingManagement.BankingManagement_api.Mapper.LoanMapper;
 import com.bankingManagement.BankingManagement_api.Repoistry.LoanReposistry;
 import com.bankingManagement.BankingManagement_api.entity.Loan;
 import com.bankingManagement.BankingManagement_api.model.LoanDTO;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.annotations.LazyToOne;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,5 +82,62 @@ public List<LoanDTO> getByLoanAmount(long amount) throws LoanDetailsNotFound {
            throw new LoanDetailsNotFound("No record exist");
        }
        return loans.stream().map(LoanMapper::convertLoanToLoanDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public String deleteByLoanId(int id) throws LoanDetailsNotFound {
+        log.info("Deleting of record is started");
+        Optional<Loan> loan = loanReposistry.findById(id);
+        if(loan.isEmpty()){
+            log.error("Id doesn't exist");
+            throw new LoanDetailsNotFound("Id doesn't eixst");
+        }
+            loanReposistry.deleteById(id);
+        return "Loan record is deleted successfully";
+    }
+
+    @Transactional
+    public String deleteByLoanType(String loanType) throws LoanDetailsNotFound {
+        List<Loan> loans = loanReposistry.findByLoanType(loanType);
+        if(CollectionUtils.isEmpty(loans)){
+            log.error("No record is present for loantype: {}",loanType);
+            throw new LoanDetailsNotFound("No record exist");
+        }
+        loanReposistry.deleteAllByLoanType(loanType);
+        return "Delete operation is successfully for this loanType";
+    }
+
+    @Transactional
+    public String deleteByLoanAmount(long amount) throws LoanDetailsNotFound {
+        List<Loan> loans = loanReposistry.findByLoanAmount(amount);
+        if(CollectionUtils.isEmpty(loans)){
+            log.error("no record exist for amount: {}",amount);
+            throw new LoanDetailsNotFound("No record exist for this amount");
+        }
+        loanReposistry.deleteAllByLoanAmount(amount);
+        return "Deletion operation succesfully done";
+    }
+
+    @Transactional
+     public String deleteByLoanTypeOrLoanAmount(String loanType, long loanAmount) throws LoanDetailsNotFound {
+        List<Loan> loans = loanReposistry.findByLoanTypeOrLoanAmount(loanType,loanAmount);
+        if(CollectionUtils.isEmpty(loans)){
+            log.error("No record exist for loanType: {} or loanAmount: {}",loanType,loanAmount);
+            throw new LoanDetailsNotFound("No record exist");
+        }
+        loanReposistry.deleteAllByLoanTypeOrLoanAmount(loanType,loanAmount);
+        return "Deletion operation successfully done";
+    }
+
+    @Transactional
+    public String deleteByLoanTypeAndLoanAmount(String loanType, long loanAmount) throws LoanDetailsNotFound{
+        log.info("Deletion process started on the basis of loanType and loanAmount");
+        List<Loan> loans = loanReposistry.findByLoanTypeAndLoanAmount(loanType,loanAmount);
+        if(CollectionUtils.isEmpty(loans)){
+            log.error("No record exist for loanType: {} And loanAmount: {}",loanType,loanAmount);
+            throw new LoanDetailsNotFound("No record eixst");
+        }
+        loanReposistry.deleteAllByLoanTypeAndLoanAmount(loanType,loanAmount);
+        return "Delete operation deleteAllByLoanTypeAndLoanAmount() is executed successfully";
     }
 }

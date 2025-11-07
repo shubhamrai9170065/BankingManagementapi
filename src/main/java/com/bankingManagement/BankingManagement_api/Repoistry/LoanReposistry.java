@@ -10,4 +10,9 @@ public interface LoanReposistry extends JpaRepository<Loan,Integer> {
     List<Loan> findByLoanAmount(long amount);
     List<Loan> findByLoanTypeOrLoanAmount(String loantype, long amount);
     List<Loan> findByLoanTypeAndLoanAmount(String loantype, long amount);
+
+    void deleteAllByLoanType(String name);
+    void deleteAllByLoanAmount(long amount);
+    void deleteAllByLoanTypeOrLoanAmount(String loanType, long amount);
+    void deleteAllByLoanTypeAndLoanAmount(String loanType, long amount);
 }

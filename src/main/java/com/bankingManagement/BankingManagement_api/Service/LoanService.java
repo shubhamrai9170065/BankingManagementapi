@@ -14,4 +14,9 @@ public interface LoanService {
     List<LoanDTO> getByLoanAmount(long amount) throws LoanDetailsNotFound;
     List<LoanDTO> getByLoanTypeOrLoanAmount(String loanType, long amount) throws LoanDetailsNotFound;
     List<LoanDTO> findByLoanTypeAndLoanAmountMethod(String loantype, long amount) throws LoanDetailsNotFound;
+    String deleteByLoanId(int id) throws LoanDetailsNotFound;
+    String deleteByLoanType(String loanType) throws LoanDetailsNotFound;
+    String deleteByLoanAmount(long amount) throws LoanDetailsNotFound;
+    String deleteByLoanTypeOrLoanAmount(String loanType, long loanAmount) throws LoanDetailsNotFound;
+    String deleteByLoanTypeAndLoanAmount(String loanType, long loanAmount) throws LoanDetailsNotFound;
 }

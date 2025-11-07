@@ -8,10 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.awt.image.ReplicateScaleFilter;
 import java.util.List;
@@ -128,4 +125,88 @@ public class LoanController {
         }
         return new ResponseEntity<>(loans,HttpStatus.OK);
     }
+
+    @DeleteMapping("/{loanId}")
+    public ResponseEntity<String> deleteByLoanId(@PathVariable("loanId") int loanId){
+        log.info("Deletions is started inside the loanController");
+        String str;
+        try{
+            str = loanService.deleteByLoanId(loanId);
+            log.info(str);
+        } catch(LoanDetailsNotFound ex){
+            log.error("loan id is not present");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(Exception ex){
+            log.error("Some error occur during the deletion operation");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(str,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/loanType/{loanType}")
+    public ResponseEntity<String> deleteByLoanType(@PathVariable("loanType") String loanType){
+        String str;
+        try{
+            str = loanService.deleteByLoanType(loanType);
+            log.info("Deletion operation is successfully done");
+        } catch(LoanDetailsNotFound ex){
+            log.error("No loanType exist");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(Exception e){
+            log.error("Some exception occur during deletion operation");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(str,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/loanAmount/{loanAmount}")
+    public ResponseEntity<String> deleteByLoanAmount(@PathVariable("loanAmount") long loanAmount){
+        String str;
+        try{
+            str = loanService.deleteByLoanAmount(loanAmount);
+            log.info("Deletion operation is successfully done");
+        }catch(LoanDetailsNotFound ex){
+            log.error("No details exist for this loanAmount");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(Exception e){
+            log.error("Some exception is occur during deletion operation");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(str,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/loanTypeOrLoanAmount/{loanType}/{loanAmount}")
+    public ResponseEntity<String> deleteByLoanTypeOrLoanAmount(@PathVariable("loanType") String loanType,
+                                                               @PathVariable("loanAmount") long loanAmount){
+        String str;
+        try{
+            str = loanService.deleteByLoanTypeOrLoanAmount(loanType,loanAmount);
+            log.info("Deletion operation is successfully");
+        } catch(LoanDetailsNotFound ex){
+            log.error("No record is present for loanType: {} Or loanAmount: {}",loanType,loanAmount);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch(Exception e){
+            log.error("Some exception occur during performing the deletion operation");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(str,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/loanTypeAndLoanAmount/{loanType}/{loanAmount}")
+    public ResponseEntity<String> deleteByLoanTypeAndLoanAmount(@PathVariable("loanType") String loanType, @PathVariable("loanAmount") long loanAmount) {
+        String str;
+        try{
+            str = loanService.deleteByLoanTypeAndLoanAmount(loanType,loanAmount);
+            log.info("Deletion of data is succesffully done");
+        } catch(LoanDetailsNotFound ex){
+            log.error("No record is exist for loanType And loanAmount");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(Exception e){
+            log.error("Some exception is occur during deletion of record");
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(str,HttpStatus.OK);
+    }
+
 }
