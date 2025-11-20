@@ -5,6 +5,8 @@ import com.bankingManagement.BankingManagement_api.Mapper.BankMapper;
 import com.bankingManagement.BankingManagement_api.Repoistry.BankRepoistry;
 import com.bankingManagement.BankingManagement_api.entity.Bank;
 import com.bankingManagement.BankingManagement_api.model.BankDTO;
+import com.bankingManagement.BankingManagement_api.request.BankRequest;
+import com.bankingManagement.BankingManagement_api.updateRequest.BankUpdateRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,5 +157,39 @@ public class BankServiceImplementataion implements BankService {
         }
         bankRepoistry.deleteAllByBankNameAndBankAddress(name,address);
         return "Record delete by name: " + name + " and address: " + address + " is completed";
+    }
+
+    // POST OPERATION
+    public BankDTO createBank(BankRequest bankRequest) throws BankDetailsNotFound {
+        log.info("create bank operation is started in service layer");
+        if(bankRequest == null){
+            log.error("Bank request object is null");
+            throw new BankDetailsNotFound("Bank request object is null");
+        }
+        Bank bank = BankMapper.convertBankRequestToBank(bankRequest);
+        bankRepoistry.save(bank);
+        return BankMapper.convertBankToBankTo(bank);
+    }
+
+    // PUT OPERATION
+
+    public BankDTO updateBank(BankUpdateRequest bankUpdateRequest) throws BankDetailsNotFound {
+        log.info("Update bank operation is started in service layer");
+
+        Optional<Bank> optionalBank = bankRepoistry.findById(bankUpdateRequest.getBankCode());
+        if(optionalBank.isEmpty()) {
+            log.error("No bank record exist for id: {}", bankUpdateRequest.getBankCode());
+            throw new BankDetailsNotFound("No bank record exist for this id");
+        }
+        Bank bank = optionalBank.get();
+        if (bankUpdateRequest.getBankName() != null) {
+            bank.setBankName(bankUpdateRequest.getBankName());
+        }
+        if(bankUpdateRequest.getBankAddress() != null){
+            bank.setBankAddress(bankUpdateRequest.getBankAddress());
+        }
+
+        bankRepoistry.save(bank);
+        return BankMapper.convertBankToBankTo(bank);
     }
 }

@@ -5,6 +5,7 @@ import com.bankingManagement.BankingManagement_api.Service.BankService;
 import com.bankingManagement.BankingManagement_api.entity.Bank;
 import com.bankingManagement.BankingManagement_api.model.BankDTO;
 import com.bankingManagement.BankingManagement_api.request.BankRequest;
+import com.bankingManagement.BankingManagement_api.updateRequest.BankUpdateRequest;
 import jakarta.servlet.annotation.HandlesTypes;
 import jakarta.validation.Valid;
 import lombok.Getter;
@@ -215,5 +216,48 @@ public class BankController {
         }
         return new ResponseEntity<>("Delete by name and address operation succesfully executed",HttpStatus.OK);
     }
+
+
+    // CONTROLLER FOR POST ENDPOINT TO CREATE BANK RECORD
+
+    @PostMapping
+    public ResponseEntity<BankDTO> createBankRecord(@RequestBody @Valid BankRequest bankRequest){
+        log.info("Create bank record operation is started in controller layer");
+        BankDTO bankDTO;
+        try{
+            bankDTO = bankService.createBank(bankRequest);
+            log.info("Create bank record operation successfully complete in controller layer");
+        } catch (BankDetailsNotFound e){
+            log.error("Bank request object is null");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e){
+            log.error("Some exception occur during creating bank record");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(bankDTO,HttpStatus.OK);
+    }
+
+    // CONTROLLER FOR PUT ENDPOINT TO UPDATE BANK RECORD
+
+    @PutMapping
+    public ResponseEntity<BankDTO> udateBankRecord(@RequestBody BankUpdateRequest bankUpdateRequest){
+        if(bankUpdateRequest == null){
+            log.error("Bank update request object is null");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        BankDTO bankDTO;
+        try{
+            bankDTO = bankService.updateBank(bankUpdateRequest);
+            log.info("Update bank record operation successfully completed in controller layer");
+        }catch (BankDetailsNotFound e){
+            log.error("No bank record exist for id: {}", bankUpdateRequest.getBankCode());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(Exception e){
+            log.error("Some exception occur during updating bank record");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(bankDTO,HttpStatus.OK);
+    }
+
 }
 

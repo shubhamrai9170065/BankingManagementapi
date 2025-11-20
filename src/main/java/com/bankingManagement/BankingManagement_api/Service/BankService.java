@@ -4,6 +4,7 @@ import com.bankingManagement.BankingManagement_api.Exception.BankDetailsNotFound
 import com.bankingManagement.BankingManagement_api.entity.Bank;
 import com.bankingManagement.BankingManagement_api.model.BankDTO;
 import com.bankingManagement.BankingManagement_api.request.BankRequest;
+import com.bankingManagement.BankingManagement_api.updateRequest.BankUpdateRequest;
 
 import java.util.List;
 
@@ -21,4 +22,11 @@ public interface BankService {
     String deleteBankByAddress(String address) throws BankDetailsNotFound;
     String deleteBankByNameOrAddress(String name, String address) throws BankDetailsNotFound;
     String deleteBankByNameAndAddress(String name, String address) throws BankDetailsNotFound;
+
+    // POST OPERATION
+    BankDTO createBank(BankRequest bankRequest) throws BankDetailsNotFound;
+
+
+    //PUT OPERATION
+    BankDTO updateBank(BankUpdateRequest bankUpdateRequest) throws BankDetailsNotFound;
 }
