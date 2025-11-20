@@ -3,20 +3,11 @@ package com.bankingManagement.BankingManagement_api.Service;
 import com.bankingManagement.BankingManagement_api.Exception.LoanDetailsNotFound;
 import com.bankingManagement.BankingManagement_api.entity.Loan;
 import com.bankingManagement.BankingManagement_api.model.LoanDTO;
-import org.hibernate.annotations.LazyToOne;
 
 import java.util.List;
 
 public interface LoanService {
-    List<LoanDTO> getAllLoans() throws LoanDetailsNotFound;
-    LoanDTO getByLaonId(int id) throws LoanDetailsNotFound;
-    List<LoanDTO> getByLoanType(String loanType) throws LoanDetailsNotFound;
-    List<LoanDTO> getByLoanAmount(long amount) throws LoanDetailsNotFound;
-    List<LoanDTO> getByLoanTypeOrLoanAmount(String loanType, long amount) throws LoanDetailsNotFound;
-    List<LoanDTO> findByLoanTypeAndLoanAmountMethod(String loantype, long amount) throws LoanDetailsNotFound;
-    String deleteByLoanId(int id) throws LoanDetailsNotFound;
-    String deleteByLoanType(String loanType) throws LoanDetailsNotFound;
-    String deleteByLoanAmount(long amount) throws LoanDetailsNotFound;
-    String deleteByLoanTypeOrLoanAmount(String loanType, long loanAmount) throws LoanDetailsNotFound;
-    String deleteByLoanTypeAndLoanAmount(String loanType, long loanAmount) throws LoanDetailsNotFound;
+    List<LoanDTO> getAlLoans() throws LoanDetailsNotFound;
+    LoanDTO getLoanById(int id) throws LoanDetailsNotFound;
+    List<LoanDTO> getLoanByType(String type) throws  LoanDetailsNotFound;
 }

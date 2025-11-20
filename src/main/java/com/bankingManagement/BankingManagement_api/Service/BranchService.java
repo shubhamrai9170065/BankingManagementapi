@@ -1,14 +1,15 @@
 package com.bankingManagement.BankingManagement_api.Service;
 
 import com.bankingManagement.BankingManagement_api.Exception.BranchDetailsNotFound;
+import com.bankingManagement.BankingManagement_api.entity.Branch;
 import com.bankingManagement.BankingManagement_api.model.BranchDTO;
 import java.util.List;
 
 public interface BranchService {
-    List<BranchDTO> getAllBranches() throws BranchDetailsNotFound;
-    BranchDTO getById(int id) throws BranchDetailsNotFound;
-    String deletebyIdMethod(int id) throws BranchDetailsNotFound;
-    List<BranchDTO> getByBranchAddressOrBranchId(String name, int id) throws BranchDetailsNotFound;
-    String deleteByBranchNameMethod(String name) throws BranchDetailsNotFound;
-    List<BranchDTO> getByBranchNameAndBranchAddress(String name, String address) throws BranchDetailsNotFound;
+    List<BranchDTO> getAllBranch() throws BranchDetailsNotFound;
+    BranchDTO getBranchById(int id) throws BranchDetailsNotFound;
+    List<BranchDTO> getBranchByBranchName(String name) throws  BranchDetailsNotFound;
+    List<BranchDTO> getBranchByBranchAddress(String address) throws BranchDetailsNotFound;
+    List<BranchDTO> getBranchByNameOrAddress(String name, String address) throws BranchDetailsNotFound;
+    List<BranchDTO> getBranchByNameAndAddress(String name, String address) throws BranchDetailsNotFound;
 }

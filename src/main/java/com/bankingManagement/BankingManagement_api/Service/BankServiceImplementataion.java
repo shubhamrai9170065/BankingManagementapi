@@ -5,6 +5,7 @@ import com.bankingManagement.BankingManagement_api.Mapper.BankMapper;
 import com.bankingManagement.BankingManagement_api.Repoistry.BankRepoistry;
 import com.bankingManagement.BankingManagement_api.entity.Bank;
 import com.bankingManagement.BankingManagement_api.model.BankDTO;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,75 +17,143 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @Service
-
 public class BankServiceImplementataion implements BankService {
 
     @Autowired
-    private BankRepoistry bankRepository;
+    private BankRepoistry bankRepoistry;
 
-    @Autowired
-    private BankMapper bankMapper;
     @Override
-    public List<BankDTO> findAllBanks() throws BankDetailsNotFound {
-       log.info("Fetching all bank details from the repository");
-        log.info("Inside the BankController.findAll");
-        List<Bank> bankList = bankRepository.findAll();
-        if (CollectionUtils.isEmpty(bankList)) {
-            log.error("Bank details not exist");
-            throw new BankDetailsNotFound("Bank details not found");
+    public List<BankDTO> getAllBanks() throws  BankDetailsNotFound {
+        log.info("Fetching detalis of all banks from sevice layer");
+        List<Bank> bank = bankRepoistry.findAll();
+
+        if(CollectionUtils.isEmpty(bank)){
+            log.info("No record exist for bank");
+            throw new BankDetailsNotFound("No record exist");
         }
 
-        return bankList.stream().map(BankMapper::convertBankToBankDTO).collect(Collectors.toList());
-    }
-    @Override
-    public BankDTO findBankById(int bankCode) throws BankDetailsNotFound {
-        log.info("Fetching data of single employee by bankCode is {}",bankCode);
-       Optional<Bank> bank = bankRepository.findById(bankCode);
-       if(bank.isEmpty()){
-           log.error("bankCode does't exists");
-           throw new BankDetailsNotFound();
-       }
-        return bankMapper.convertBankToBankDTO(bank.get());  // bank.get() give value from optional
+        List<BankDTO> bankDto = bank.stream().map(BankMapper::convertBankToBankTo).collect(Collectors.toList());
+        return bankDto;
     }
 
-    public List<BankDTO> findBankByNameMethod(String bankName) throws BankDetailsNotFound{
-        log.info("Fetching bank details by bank name: {}", bankName);
-        List<Bank> banks = bankRepository.findByBankName(bankName);
-        if(CollectionUtils.isEmpty(banks)){
-            log.error("Bank details not fouund for the name: {}",bankName);
-             throw new BankDetailsNotFound("Bank details not found for the name: " + bankName);
+   public BankDTO getById(int id) throws BankDetailsNotFound {
+        log.info("Fetching data on the basis of id in service layer");
+        Optional<Bank> bank = bankRepoistry.findById(id);
+        if(bank.isEmpty()){
+            log.info("No bank record exist for id: {}",id);
+            throw new BankDetailsNotFound("No record exist for this id");
         }
-        return banks.stream().map(BankMapper::convertBankToBankDTO).collect(Collectors.toList());
+        return BankMapper.convertBankToBankTo(bank.get());
     }
 
-    public List<BankDTO> findBankByAddressMethod(String bankAddress) throws BankDetailsNotFound{
-        log.info("Fetching address details by bank address: {}", bankAddress);
-        List<Bank> banks = bankRepository.findByBankAddress(bankAddress);
-        if(CollectionUtils.isEmpty(banks)){
-            log.error("Bank details not found for the address: {}",bankAddress);
-            throw new BankDetailsNotFound("Bank details not found for the address: ");
+    public List<BankDTO> getByName(String name) throws BankDetailsNotFound {
+        log.info("Fetching data on the basis of bank name in serive layer");
+        List<Bank> bank = bankRepoistry.findByBankName(name);
+
+        if(CollectionUtils.isEmpty(bank)){
+            log.info("No bank details exist for name: {}",name);
+            throw new BankDetailsNotFound("No bank details exist for this name");
         }
-        return banks.stream().map(BankMapper::convertBankToBankDTO).collect(Collectors.toList());
+        List<BankDTO> banks = bank.stream().map(BankMapper::convertBankToBankTo).collect(Collectors.toList());
+        return banks;
     }
 
-   public List<BankDTO> findBanknameOrBankAddressMethod(String name, String address) throws BankDetailsNotFound {
-        log.info("Fetching details of bank on basis of bank name and bank address");
-        List<Bank> banks = bankRepository.findByBankNameOrBankAddress(name, address);
-        if(CollectionUtils.isEmpty(banks)){
-            log.error("No bank details exist for name: {} or address: {} ",name, address);
-            throw new BankDetailsNotFound("No bank details exist for this name and address");
+    public List<BankDTO> getByAddress(String address) throws BankDetailsNotFound {
+        log.info("Fetching data on the baisis of bank address in service layer");
+        List<Bank> bank = bankRepoistry.findByBankAddress(address);
+        if(CollectionUtils.isEmpty(bank)){
+            String str = "No record exist for address: " + address;
+            log.error(str);
+            throw new BankDetailsNotFound(str);
         }
-        return banks.stream().map(BankMapper::convertBankToBankDTO).collect(Collectors.toList());
-   }
+        List<BankDTO> bankDto = bank.stream().map(BankMapper::convertBankToBankTo).collect(Collectors.toList());
+        return bankDto;
+    }
 
-   public List<BankDTO> findByBankNameAndBankAddressMethod(String name, String address) throws BankDetailsNotFound {
-        log.info("Fetching the bank details on the basis of bank name and bank address");
-        List<Bank> banks = bankRepository.findByBankNameAndBankAddress(name,address);
-        if(CollectionUtils.isEmpty(banks)){
-            log.error("No bank details exist for name: {} and address {}",name,address);
-            throw  new BankDetailsNotFound("Detials not exist for this name and address");
+    public List<BankDTO> getByBankNameOrBankAddress(String name, String address) throws BankDetailsNotFound {
+        log.info("Fetching data on the basis of bank name or bank address in service layer");
+        List<Bank> bank = bankRepoistry.findByBankNameOrBankAddress(name,address);
+        if(CollectionUtils.isEmpty(bank)){
+            String str = "No record for name : " + name + " or address: " + address;
+            log.error(str);
+            throw new BankDetailsNotFound(str);
         }
-        return banks.stream().map(BankMapper::convertBankToBankDTO).collect(Collectors.toList());
-   }
+        List<BankDTO> bankDto = bank.stream().map(BankMapper::convertBankToBankTo).collect(Collectors.toList());
+        return bankDto;
+    }
 
+    public List<BankDTO> getByBankNameAndBankAddress(String name, String address) throws BankDetailsNotFound {
+        log.info("Fetching of bank details on basis of name: {} and address: {}",name,address);
+        List<Bank> banks = bankRepoistry.findByBankNameAndBankAddress(name,address);
+
+        if(CollectionUtils.isEmpty(banks)){
+            String str = "No record exist for name: " + name + " and address: " + address;
+            log.error(str);
+            throw new BankDetailsNotFound(str);
+        }
+        List<BankDTO> bankDto = banks.stream().map(BankMapper::convertBankToBankTo).collect(Collectors.toList());
+        return bankDto;
+    }
+
+    //DELETEION OPERATION IS STARTED
+
+    @Transactional
+    public String deleteBankById(int id) throws BankDetailsNotFound {
+        log.info("Delete by id operation is started in service layer");
+        Optional<Bank> bank = bankRepoistry.findById(id);
+        if(bank.isEmpty()){
+            log.error("Bank id not eixst");
+            throw new BankDetailsNotFound("Id doesn't exist");
+        }
+        bankRepoistry.deleteById(id);
+        return "Record deteled successfully which have id " + id;
+    }
+
+    @Transactional
+    public String deleteBankByName(String name) throws BankDetailsNotFound {
+        log.info("Delete by name opeation is started in service layer");
+        List<Bank> bank = bankRepoistry.findByBankName(name);
+        if(CollectionUtils.isEmpty(bank)){
+            log.info("No bank record exist for name: {}",name);
+            throw new BankDetailsNotFound("No bank record exist");
+        }
+        bankRepoistry.deleteAllByBankName(name);
+        return "Record delete by name " + name + " is completed";
+    }
+
+    @Transactional
+    public String deleteBankByAddress(String address) throws BankDetailsNotFound {
+        log.info("Delee by address operation is started in serice layer");
+        List<Bank> bank = bankRepoistry.findByBankAddress(address);
+        if(CollectionUtils.isEmpty(bank)){
+            log.error("No bank record exist for address: {}", address);
+            throw new BankDetailsNotFound("No bank record exist for this address");
+        }
+        bankRepoistry.deleteAllByBankAddress(address);
+        return "Record delete by address: " + address + " is complerted";
+    }
+
+    @Transactional
+    public String deleteBankByNameOrAddress(String name, String address) throws BankDetailsNotFound {
+        log.info("Delete by name or address operaation is started in service layer");
+        List<Bank> bank = bankRepoistry.findByBankNameOrBankAddress(name,address);
+        if(CollectionUtils.isEmpty(bank)){
+            log.error("No bank record exist for name: {} or address: {}",name,address);
+            throw new BankDetailsNotFound("No bank record exist for this name or address");
+        }
+        bankRepoistry.deleteAllByBankNameOrBankAddress(name,address);
+        return "Record delete by name: " + name + " or address: " + address + " is completed";
+    }
+
+    @Transactional
+    public String deleteBankByNameAndAddress(String name, String address) throws BankDetailsNotFound {
+        log.info("Delete by name and address operation is started in servie layer");
+        List<Bank> bank = bankRepoistry.findByBankNameAndBankAddress(name,address);
+        if(CollectionUtils.isEmpty(bank)){
+            log.error("No bank record exist for name: {} and address: {}",name,address);
+            throw new BankDetailsNotFound("No bank record exist for this name and address");
+        }
+        bankRepoistry.deleteAllByBankNameAndBankAddress(name,address);
+        return "Record delete by name: " + name + " and address: " + address + " is completed";
+    }
 }

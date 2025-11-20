@@ -6,13 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface LoanReposistry extends JpaRepository<Loan,Integer> {
-    List<Loan> findByLoanType(String loanType);
-    List<Loan> findByLoanAmount(long amount);
-    List<Loan> findByLoanTypeOrLoanAmount(String loantype, long amount);
-    List<Loan> findByLoanTypeAndLoanAmount(String loantype, long amount);
-
-    void deleteAllByLoanType(String name);
-    void deleteAllByLoanAmount(long amount);
-    void deleteAllByLoanTypeOrLoanAmount(String loanType, long amount);
-    void deleteAllByLoanTypeAndLoanAmount(String loanType, long amount);
+    List<Loan> findByLoanType(String type);
 }

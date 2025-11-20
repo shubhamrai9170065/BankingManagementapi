@@ -19,63 +19,108 @@ import java.util.List;
 
 @Log4j2
 @RestController
-@RequestMapping("/api/v2/accounts")
+@RequestMapping("/api/v3/accounts")
 public class AccountController {
+
     @Autowired
     private AccountService accountService;
 
     @GetMapping
-    public ResponseEntity<List<AccountDTO>> findingAllAccounts(){
-        log.info("Account controller start fecthing all the accounts");
+    public ResponseEntity<List<AccountDTO>> getAllAccountDetails(){
         List<AccountDTO> accounts;
         try{
-            accounts = accountService.findAllAccounts();
-            log.info("Accounts details is: {}", accounts);
-        }catch(AccountDetailsNotFound ex){
-            log.error("Account doesn't exist");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            accounts = accountService.getAllAccount();
+            log.info("Account details is: {}",accounts);
+        }catch(AccountDetailsNotFound e){
+            log.error("No record exist for account");
+            return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }catch(Exception e){
-            log.info("Some exception generated while fetching the details of account");
-            e.printStackTrace();
+            log.error("some exception occur during fetching all details of account");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(accounts,HttpStatus.OK);
     }
 
-
-    @GetMapping("/{accountNumber}")
-    public ResponseEntity<AccountDTO> findByAccountNumber(@PathVariable("accountNumber") int accountNumber){
-        log.info("fetching details of customer by account number in account controller and findByAccountNumber method");
+    @GetMapping("/{id}")
+    public ResponseEntity<AccountDTO> getByAccountId(@PathVariable("id") int id){
         AccountDTO account;
         try{
-            account = accountService.findByAccountNumber(accountNumber);
-            log.info("Account details for account number is: {}",account);
-        } catch(AccountDetailsNotFound ex){
-            log.error("Account number doesn't exist");
+            account = accountService.getAccountById(id);
+            log.info("Account details for id: {} is: {}",id,account);
+        } catch(AccountDetailsNotFound e){
+            log.error("No account record eixst for id: {}",id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch(Exception e){
-            log.error("Some exception occur while fetching the data by account number");
-            e.printStackTrace();
+        }catch(Exception e){
+            log.error("Some exception occur during fetching the account details based on id");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(account,HttpStatus.OK);
+    }
+
+    @GetMapping("/accountType/{type}")
+    public ResponseEntity<List<AccountDTO>> getAccountByAccountType(@PathVariable("type") String type){
+        List<AccountDTO> account;
+        try{
+            account = accountService.getAccountByAccountType(type);
+            log.info("Account details for account type: {} is: {}",type,account);
+        }catch (AccountDetailsNotFound e){
+            log.error("No account record exist for account type: {}",type);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(Exception e){
+            log.error("Some exception occur during fetching the details of account based on account type");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(account,HttpStatus.OK);
     }
 
-    @GetMapping("/accountType/{accountType}")
-    public ResponseEntity<List<AccountDTO>> findByAccountType(@PathVariable("accountType") String accountType){
-        log.info("Fetching of data on the basis of accountType");
-        List<AccountDTO> accounts;
+    @GetMapping("/balance/{balance}")
+    public ResponseEntity<List<AccountDTO>> getAccountByAccountBalance(@PathVariable("balance") Double balance){
+        List<AccountDTO> account;
         try{
-            accounts = accountService.findByAccountType(accountType);
-            log.info("The details of account is: {}",accounts);
-        }catch(AccountDetailsNotFound ex){
-            log.error("No account exist for account type: {}",accountType);
+            account = accountService.getAccountByAccountBalance(balance);
+            log.info("Account details for balance: {} is: {}",balance,account);
+        } catch (AccountDetailsNotFound e) {
+            log.error("No account record exist for  account balance: {}",balance);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }catch(Exception e){
-            log.error("some exception occur during fetching the data by accountType");
-            e.printStackTrace();
+            log.info("Some exception occur during fetching the account by balance");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(account,HttpStatus.OK);
+    }
+
+    @GetMapping("/typeOrBalnce/{type}/{balance}")
+    public ResponseEntity<List<AccountDTO>> getAccountByTypeOrBalance(@PathVariable("type") String type,
+                                                                      @PathVariable("balance") Double balance){
+        List<AccountDTO> accounts;
+        try{
+            accounts = accountService.getAccountByTypeOrBalance(type,balance);
+            log.info("Account details for type: {} or balance: {} is: {}",type,balance,accounts);
+        }catch(AccountDetailsNotFound e){
+            log.error("No account record exist for type: {} or balance: {}",type,balance);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(Exception e){
+            log.error("Some exception occur during the fetching the detail based on type: {} or balance: {}",type,balance);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(accounts,HttpStatus.OK);
+    }
+
+    @GetMapping("/typeAndBalance/{type}/{balance}")
+    public ResponseEntity<List<AccountDTO>> getAccountByTypeAndBalance(@PathVariable("type") String type,
+                                                                       @PathVariable("balance") Double balance){
+        List<AccountDTO> account;
+        try{
+            account = accountService.getAccountByTypeAndBalance(type,balance);
+            log.info("Account details for type: {} and balance: {} is: {}",type,balance,account);
+        }catch(AccountDetailsNotFound e){
+            log.error("No account record exist for type: {} and balance: {}",type,balance);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(Exception e){
+            log.error("Some exception occur during fetching account details based on type and balance");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(account,HttpStatus.OK);
     }
 }

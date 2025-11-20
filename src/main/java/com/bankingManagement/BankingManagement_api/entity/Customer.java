@@ -1,33 +1,37 @@
+// Customer.java
 package com.bankingManagement.BankingManagement_api.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
 @Entity
 @Table(name = "T_Customer")
 @Getter
+@Setter
 public class Customer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_id_sequence")
-    @SequenceGenerator(name = "customer_id_sequence", sequenceName = "customer_id_sequence", allocationSize = 1)
-    @Column(name = "Cust_ID")
-    private int customerId;
 
-    @Column(name = "Cust_Name")
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "custSeq")
+    @SequenceGenerator(name = "custSeq", sequenceName = "cust_seq", allocationSize = 1)
+    @Column(name = "cust_id")
+    private Integer customerId;
+
+    @Column(name = "cust_name")
     private String customerName;
 
-    @Column(name = "Cust_Phone")
-    private long customerPhone;
-    @Column(name = "Cust_Address")
+    @Column(name = "cust_phone")
+    private Long customerPhone;
+
+    @Column(name = "cust_address")
     private String customerAddress;
 
-
-    @OneToMany(mappedBy = "customers")
-    private Set<Loan>loans;
-
-
-    @OneToMany(mappedBy = "customers")
+    // Correct mapping (IMPORTANT)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Account> accounts;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Loan> loans;
 }

@@ -4,7 +4,6 @@ import com.bankingManagement.BankingManagement_api.Exception.BranchDetailsNotFou
 import com.bankingManagement.BankingManagement_api.Mapper.BranchMapper;
 import com.bankingManagement.BankingManagement_api.Repoistry.BranchReposistry;
 import com.bankingManagement.BankingManagement_api.entity.Branch;
-import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,77 +19,79 @@ import java.util.stream.Collectors;
 public class BranchServiceImpmentation  implements BranchService {
 
     @Autowired
-    private BranchReposistry branchRepository;
+    private BranchReposistry branchReposistry;
 
-    @Autowired
-    private BranchMapper branchMapper;
+    public List<BranchDTO> getAllBranch() throws BranchDetailsNotFound {
+        log.info("Fetching detail of branch in service layer");
+        List<Branch> branch = branchReposistry.findAll();
 
-    public List<BranchDTO> getAllBranches() throws BranchDetailsNotFound {
-        log.info("Fetching data of branche entity");
-        List<Branch> branch = branchRepository.findAll();
         if(CollectionUtils.isEmpty(branch)){
-            log.error("Branch details not found");
-            throw new BranchDetailsNotFound("Branch doesn't exist");
+            log.error("No branch record exist");
+            throw new BranchDetailsNotFound("No branch details exist now");
         }
-        return branch.stream().map(BranchMapper::convertBranchToBranchDTO).collect(Collectors.toList());
+
+        List<BranchDTO> branches = branch.stream().map(BranchMapper::convertBranchToBranchDTO).collect(Collectors.toList());
+        return branches;
     }
-    public BranchDTO getById(int id) throws BranchDetailsNotFound{
-        log.info("Fetching data by branch id");
-        Optional<Branch> branch = branchRepository.findById(id);
+
+    public BranchDTO getBranchById(int id) throws BranchDetailsNotFound {
+        log.info("Fetching branch details based on id");
+        Optional<Branch> branch = branchReposistry.findById(id);
         if(branch.isEmpty()){
-            log.error("Id {} not exist",id);
-            throw new BranchDetailsNotFound("Branch id not exist in db");
-        }
-        return branchMapper.convertBranchToBranchDTO(branch.get());
-    }
-
-    @Override
-    public List<BranchDTO> getByBranchAddressOrBranchId(String address, int id) throws BranchDetailsNotFound {
-        log.info("Fetching branch by address: {} or ID: {}", address, id);
-        List<Branch> branches = branchRepository.findByBranchAddressOrBranchID(address, id);
-
-        if (CollectionUtils.isEmpty(branches)) {
-            log.error("No branch found for address: {} or ID: {}", address, id);
-            throw new BranchDetailsNotFound("No branch found for given address or ID");
+            String str = "No record exist for id: " + id;
+            log.error(str);
+            throw new BranchDetailsNotFound(str);
         }
 
-        return branches.stream().map(BranchMapper::convertBranchToBranchDTO).collect(Collectors.toList());
+        return BranchMapper.convertBranchToBranchDTO(branch.get());
     }
 
-    public String deletebyIdMethod(int id) throws BranchDetailsNotFound {
-        log.info("Trying to delete the data by id");
-        Optional<Branch> branch = branchRepository.findById(id);
-        if(branch.isEmpty()){
-            log.error("id is not eixst");
-            throw new BranchDetailsNotFound("Id is not exist");
-        }
-         branchRepository.deleteById(id);
-        return "Data deleted by id is successfully resolve";
-    }
-
-    @Transactional
-    public String deleteByBranchNameMethod(String name) throws BranchDetailsNotFound {
-        log.info("Deleting branch data by name: {}", name);
-        List<Branch> branch = branchRepository.findByBranchName(name);
+    public List<BranchDTO> getBranchByBranchName(String name) throws  BranchDetailsNotFound {
+        log.info("Fetching branch details based on name");
+        List<Branch> branch = branchReposistry.findByBranchName(name);
         if(CollectionUtils.isEmpty(branch)){
-            log.error("Branch name doesn't exist");
-            throw new BranchDetailsNotFound("Branch name is not exist");
+            String str = "No branch details exist for name: " + branch;
+            log.error(str);
+            throw  new BranchDetailsNotFound(str);
         }
-
-             branchRepository.deleteAllByBranchName(name);
-
-
-        log.info("Successfully deleted  branch record(s) with name: {}", name);
-        return "Successfully deleted  branch record(s) with name: " + name;
+        List<BranchDTO> branchDto = branch.stream().map(BranchMapper::convertBranchToBranchDTO).collect(Collectors.toList());
+        return branchDto;
     }
 
-    public List<BranchDTO> getByBranchNameAndBranchAddress(String name, String address) throws BranchDetailsNotFound{
-        log.info("Fetching data on the basis of branchName and BranchAddress");
-        List<Branch> branches = branchRepository.findByBranchNameAndBranchAddress(name,address);
-        if(CollectionUtils.isEmpty(branches)){
-            log.error("Branch details not eixst for name {} and address {}",name, address);
-            throw new BranchDetailsNotFound("Branch details not exist");
+    public List<BranchDTO> getBranchByBranchAddress(String address) throws BranchDetailsNotFound {
+        log.info("fetching branch details no basis of branch address");
+        List<Branch> branch = branchReposistry.findByBranchAddress(address);
+        if(CollectionUtils.isEmpty(branch)){
+            String str = "No branch record exist for address: " + address;
+            log.error(str);
+            throw new BranchDetailsNotFound(str);
         }
-        return branches.stream().map(BranchMapper::convertBranchToBranchDTO).collect(Collectors.toList());
+
+        List<BranchDTO> branches = branch.stream().map(BranchMapper::convertBranchToBranchDTO).collect(Collectors.toList());
+        return branches;
+    }
+
+    public List<BranchDTO> getBranchByNameOrAddress(String name, String address) throws BranchDetailsNotFound {
+        log.info("Fetching branch details on basis of name: {} or address: {}",name,address);
+        List<Branch> branch = branchReposistry.findByBranchNameOrBranchAddress(name,address);
+        if(CollectionUtils.isEmpty(branch)){
+            String str = "No branch record exist for name:  " + name + "or address: " + address;
+            log.error(str);
+            throw new BranchDetailsNotFound(str);
+        }
+        List<BranchDTO> branches = branch.stream().map(BranchMapper::convertBranchToBranchDTO).collect(Collectors.toList());
+        return branches;
+    }
+
+    public List<BranchDTO> getBranchByNameAndAddress(String name, String address) throws BranchDetailsNotFound {
+        log.info("Fetching of branch Details on basis of name: {} and address: {}",name,address);
+        List<Branch> branch = branchReposistry.findByBranchNameAndBranchAddress(name,address);
+        if(CollectionUtils.isEmpty(branch)){
+            String str = "No branch details exist for name: " + name + " and address: " + address;
+            log.info(str);
+            throw new BranchDetailsNotFound(str);
+        }
+        List<BranchDTO> branches = branch.stream().map(BranchMapper::convertBranchToBranchDTO).collect(Collectors.toList());
+        return branches;
     }
 }

@@ -2,7 +2,7 @@ package com.bankingManagement.BankingManagement_api.Service;
 
 import com.bankingManagement.BankingManagement_api.Exception.AccountDetailsNotFound;
 import com.bankingManagement.BankingManagement_api.Mapper.AccountMapper;
-import com.bankingManagement.BankingManagement_api.Mapper.BankMapper;
+import com.bankingManagement.BankingManagement_api.Mapper.BranchMapper;
 import com.bankingManagement.BankingManagement_api.Repoistry.AccountRepoistry;
 import com.bankingManagement.BankingManagement_api.entity.Account;
 import com.bankingManagement.BankingManagement_api.model.AccountDTO;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,38 +23,74 @@ public class AccountServiceImplementation implements AccountService {
     @Autowired
     private AccountRepoistry accountRepoistry;
 
-    @Autowired
-    private AccountMapper accountMapper;
-
-    @Override
-    public List<AccountDTO> findAllAccounts() throws AccountDetailsNotFound {
-        log.info("Fetching details of all account");
-        List<Account> account = accountRepoistry.findAll();
-        if(CollectionUtils.isEmpty(account)){
-            log.error("Account is not exist");
-            throw new AccountDetailsNotFound("Account details not exist");
+    public List<AccountDTO> getAllAccount() throws AccountDetailsNotFound {
+        log.info("Fetching all details of account in service layer");
+        List<Account> accounts = accountRepoistry.findAll();
+        if(CollectionUtils.isEmpty(accounts)){
+            log.error("No account details exist");
+            throw new AccountDetailsNotFound("NO account record exist");
         }
-        log.info("Fetching operation successfully executed without any execution");
-        return account.stream().map(AccountMapper::convertAccountToAccountDTO).collect(Collectors.toList());
+        List<AccountDTO> accountDto = accounts.stream().map(AccountMapper::convertAccountToAccountDTO).collect(Collectors.toList());
+        return accountDto;
     }
 
-    public AccountDTO findByAccountNumber(int id) throws AccountDetailsNotFound {
-        log.info("Fetching account details on basis their account number");
+    public AccountDTO getAccountById(int id) throws AccountDetailsNotFound {
+        log.info("Fetching details of account by id: {}",id);
         Optional<Account> account = accountRepoistry.findById(id);
         if(account.isEmpty()){
-            log.error("Account number doesn't exist");
-            throw new AccountDetailsNotFound("Account number doesn't exist");
+            String str = "No account record exist for id: " + id;
+            log.info(str);
+            throw new AccountDetailsNotFound(str);
         }
+
         return AccountMapper.convertAccountToAccountDTO(account.get());
     }
 
-   public  List<AccountDTO> findByAccountType(String accountType) throws AccountDetailsNotFound {
-        log.info("fetching the data on the basis of accountType");
-        List<Account> account = accountRepoistry.findByAccountType(accountType);
-        if(CollectionUtils.isEmpty(account)){
-            log.error("No account exist for type: {}",accountType);
-            throw new AccountDetailsNotFound("No account exist");
+    public List<AccountDTO> getAccountByAccountType(String type) throws  AccountDetailsNotFound {
+        log.info("Fetching details of account by account type: {}",type);
+        List<Account> accounts = accountRepoistry.findByAccountType(type);
+        if(CollectionUtils.isEmpty(accounts)){
+            String str = "No account record exist for account type: " + type;
+            log.error(str);
+            throw new AccountDetailsNotFound(str);
         }
-        return account.stream().map(AccountMapper::convertAccountToAccountDTO).collect(Collectors.toList());
+        List<AccountDTO> accountDto = accounts.stream().map(AccountMapper::convertAccountToAccountDTO).collect(Collectors.toList());
+        return accountDto;
+    }
+
+    public List<AccountDTO> getAccountByAccountBalance(Double balance) throws AccountDetailsNotFound {
+        log.info("Fetching details of account by account balance: {}",balance);
+        List<Account> accounts = accountRepoistry.findByAccountBalance(balance);
+        if(CollectionUtils.isEmpty(accounts)){
+            String str = "No account record exist for balance: {}" + balance;
+            log.info(str);
+            throw new AccountDetailsNotFound(str);
+        }
+        List<AccountDTO> accountDto = accounts.stream().map(AccountMapper::convertAccountToAccountDTO).collect(Collectors.toList());
+        return accountDto;
+    }
+
+    public List<AccountDTO> getAccountByTypeOrBalance(String type, Double balance) throws AccountDetailsNotFound {
+        log.info("Fetching details of account based on type or balance");
+        List<Account> accounts = accountRepoistry.findByAccountTypeOrAccountBalance(type,balance);
+        if(CollectionUtils.isEmpty(accounts)){
+            String str = "No record exist for type: " + type + " or balance: " + balance;
+            log.info(str);
+            throw  new AccountDetailsNotFound(str);
+        }
+        List<AccountDTO> accountsDto = accounts.stream().map(AccountMapper::convertAccountToAccountDTO).collect(Collectors.toList());
+        return accountsDto;
+    }
+
+    public List<AccountDTO> getAccountByTypeAndBalance(String type, Double balance) throws AccountDetailsNotFound {
+        log.info("Fetching details of account based on type: {} and balnce: {}",type,balance);
+        List<Account> accounts = accountRepoistry.findByAccountTypeAndAccountBalance(type,balance);
+        if(CollectionUtils.isEmpty(accounts)){
+            String str = "No record exist for type: " + type + " and balance: {}" + balance;
+            log.info(str);
+            throw new AccountDetailsNotFound(str);
+        }
+        List<AccountDTO> account = accounts.stream().map(AccountMapper::convertAccountToAccountDTO).collect(Collectors.toList());
+        return account;
     }
 }
