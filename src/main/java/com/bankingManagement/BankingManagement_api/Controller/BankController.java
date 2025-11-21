@@ -160,7 +160,7 @@ public class BankController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("Delete operation successfully excuted", HttpStatus.OK);
+        return new ResponseEntity<>(str, HttpStatus.OK);
     }
 
     @DeleteMapping("/address/{address}")
@@ -177,7 +177,7 @@ public class BankController {
             log.error("Some excepiton occur during the performing during delete operatin by adress: {}", address);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("Delete operation successfuly executed by address", HttpStatus.OK);
+        return new ResponseEntity<>(str, HttpStatus.OK);
     }
 
 

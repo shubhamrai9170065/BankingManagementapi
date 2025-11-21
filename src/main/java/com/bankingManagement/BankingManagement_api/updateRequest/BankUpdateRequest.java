@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BankUpdateRequest {
+
     private int bankCode;
     private String bankName;
     private String bankAddress;

@@ -4,6 +4,7 @@ import com.bankingManagement.BankingManagement_api.Exception.BranchDetailsNotFou
 import com.bankingManagement.BankingManagement_api.Mapper.BranchMapper;
 import com.bankingManagement.BankingManagement_api.Repoistry.BranchReposistry;
 import com.bankingManagement.BankingManagement_api.entity.Branch;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -94,4 +95,48 @@ public class BranchServiceImpmentation  implements BranchService {
         List<BranchDTO> branches = branch.stream().map(BranchMapper::convertBranchToBranchDTO).collect(Collectors.toList());
         return branches;
     }
+
+    // DETETE OPERATION METHOD IMPLEMENTATION
+    @Transactional
+    public String deleteBranchById(int id) throws BranchDetailsNotFound {
+        log.info("Delete operation is started by id: {}", id);
+        Optional<Branch> branch = branchReposistry.findById(id);
+        if (branch.isEmpty()) {
+            String str = "No branch record exist for id: " + id;
+            log.error(str);
+            throw new BranchDetailsNotFound(str);
+        }
+        branchReposistry.deleteById(id);
+        return "Branch record deleted successfully for id: " + id;
+    }
+
+    @Transactional
+    public String deleteBranchByName(String name) throws BranchDetailsNotFound {
+        log.info("Delete operation is started by name: {}",name);
+        List<Branch> branch = branchReposistry.findByBranchName(name);
+        if(CollectionUtils.isEmpty(branch)){
+            log.error("No branch record exist for name: {}",name);
+            throw new BranchDetailsNotFound("No branch record exist for name: " + name);
+        }
+        branchReposistry.deleteAllByBranchName(name);
+        return "Branch record deleted successfully for name: " + name;
+    }
+
+    @Transactional
+    public String deleteBranchByAddress(String address) throws BranchDetailsNotFound {
+        log.info("Delete operatin is started by address: {}",address);
+        List<Branch> branch = branchReposistry.findByBranchAddress(address);
+        if(CollectionUtils.isEmpty(branch)){
+            log.error("No branch record exist for address: {}", address);
+            throw new BranchDetailsNotFound("No branch record exist for address: " + address);
+        }
+        branchReposistry.deleteAllByBranchAddress(address);
+        return "Branch record deleted successfully for address: " + address;
+    }
+
+    public String deleteBranchByNameOrAddress(String name, String address) throws BranchDetailsNotFound {
+        return null;
+
+    }
+
 }

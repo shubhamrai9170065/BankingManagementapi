@@ -116,4 +116,57 @@ public class BranchController {
         }
         return new ResponseEntity<>(branch,HttpStatus.OK);
     }
+
+    // DELETE OPERATIONS
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteBranchById(@PathVariable("id") int id){
+        log.info("Deleting branch record for id: {} started in controller layeer",id);
+        String str;
+        try{
+            str = branchService.deleteBranchById(id);
+            log.info("Branch record for id: {} deleted successfully",id);
+        }catch(BranchDetailsNotFound e){
+            log.error("No branc record exist for id: {}",id);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(Exception e) {
+            log.error("Some exception occur during deleting the branch record for id: {}",id);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(str,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/name/{name}")
+    public ResponseEntity<String> deleteBranchByName(@PathVariable("name") String name){
+        log.info("Deleting branch record for name: {} operation started in controller layer",name);
+        String str;
+        try{
+            str = branchService.deleteBranchByName(name);
+            log.info("Branch record for name: {} deleted successfully",name);
+        }catch(BranchDetailsNotFound e){
+            log.error("No branch record exist for name: {}",name);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (Exception e){
+            log.error("Some exception occur during deleting the branch record for name: {}",name);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(str,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/address/{address}")
+    public ResponseEntity<String> delleteBranchByAddress(@PathVariable("address") String address){
+        log.info("Deleting branch record for address: {} operation started in controller layer",address);
+        String str;
+        try{
+            str = branchService.deleteBranchByAddress(address);
+            log.info("Branch record for address: {} deleted successfully",address);
+        }catch(BranchDetailsNotFound e){
+            log.error("No branch record exist for address: {}",address);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch(Exception e){
+            log.error("Some exception occur during deleting the branch record for address: {}",address);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(str,HttpStatus.OK);
+    }
+
 }

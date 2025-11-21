@@ -167,7 +167,7 @@ public class BankServiceImplementataion implements BankService {
             throw new BankDetailsNotFound("Bank request object is null");
         }
         Bank bank = BankMapper.convertBankRequestToBank(bankRequest);
-        bankRepoistry.save(bank);
+        bankRepoistry.save(bank);  // inserting data in bank table
         return BankMapper.convertBankToBankTo(bank);
     }
 
